@@ -1,22 +1,36 @@
 import 'package:flutter/material.dart';
-import 'login2_screen.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'splash_screen.dart';
+import 'theme_controller.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init();
+  Get.put(ThemeController()); // INI WAJIB!
+
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ThemeController themeController = Get.find();
+
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    return Obx(
+      () => GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Barbershop App',
+        theme: ThemeData.light().copyWith(useMaterial3: true),
+        darkTheme: ThemeData.dark().copyWith(useMaterial3: true),
+        themeMode:
+            themeController.isLightMode.value
+                ? ThemeMode.light
+                : ThemeMode.dark,
+        home: SplashScreen(),
       ),
-
-      home: Login2Screen(),
     );
   }
 }
