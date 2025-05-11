@@ -7,7 +7,7 @@ import 'theme_controller.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-  Get.put(ThemeController()); // INI WAJIB!
+  Get.put(ThemeController());
 
   runApp(MyApp());
 }
