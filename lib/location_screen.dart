@@ -77,19 +77,6 @@ class _LocationScreenState extends State<LocationScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Hello $username",
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: Colors.amber,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "PASS : $password",
-                          style: theme.textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
                           "Selamat datang di barbershop kami\nsilakan pilih layanan apa yang kamu butuhkan.",
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.textTheme.bodySmall?.color

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'login2_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -16,8 +17,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool agreeToTerms = false;
+  bool _obscurePassword = true;
 
-  void handleSignup() {
+  void handleSignup() async {
     final firstName = firstNameController.text.trim();
     final lastName = lastNameController.text.trim();
     final username = usernameController.text.trim();
@@ -48,7 +50,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    Get.to(() => const LoginScreen());
+    try {
+      final response = await Supabase.instance.client.auth.signUp(
+        email: email,
+        password: password,
+        data: {
+          'first_name': firstName,
+          'last_name': lastName,
+          'username': username,
+        },
+      );
+
+      if (response.user != null) {
+        Get.snackbar('Sukses', 'Akun berhasil dibuat!');
+        Get.to(() => const LoginScreen());
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Gagal',
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 
   void goToLogin() {
@@ -83,7 +107,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             const SizedBox(height: 16),
 
-            // Checkbox Terms
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -116,7 +139,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             const SizedBox(height: 16),
 
-            // Sign Up & Cancel
             Row(
               children: [
                 Expanded(
@@ -154,7 +176,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Already signed up
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -189,10 +210,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       padding: const EdgeInsets.only(bottom: 12),
       child: TextField(
         controller: controller,
-        obscureText: isPassword,
+        obscureText: isPassword ? _obscurePassword : false,
+        style: const TextStyle(color: Colors.black),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(color: Colors.black87),
+          hintStyle: const TextStyle(color: Color.fromARGB(221, 58, 57, 57)),
           filled: true,
           fillColor: Colors.white,
           contentPadding: const EdgeInsets.symmetric(
@@ -203,6 +225,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
+          suffixIcon:
+              isPassword
+                  ? IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  )
+                  : null,
         ),
       ),
     );

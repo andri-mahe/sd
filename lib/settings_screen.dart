@@ -3,7 +3,6 @@ import 'package:coba/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'customer_service_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -39,10 +38,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  void logout() {
-    box.remove('username');
-    box.remove('password');
-    Get.off(() => SplashScreen());
+  void logout() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Konfirmasi'),
+            content: const Text('Apakah Anda yakin ingin keluar?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Batal'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Ya, Keluar'),
+              ),
+            ],
+          ),
+    );
+
+    if (confirm == true) {
+      box.remove('username');
+      box.remove('password');
+      Get.offAll(() => SplashScreen());
+    }
   }
 
   Widget _buildListTile({

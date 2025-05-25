@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+// ignore: unused_import
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+// ignore: unused_import
 import 'location_screen.dart';
 
 class HomeTab extends StatefulWidget {
@@ -115,19 +117,6 @@ class _HomeTabState extends State<HomeTab> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Hello $username",
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: Colors.amber,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                      Text(
-                        "PASS : $password",
-                        style: theme.textTheme.bodyMedium,
-                      ),
-                      const SizedBox(height: 10),
                       Text(
                         "Selamat datang di barbershop kami\nsilakan pilih layanan apa yang kamu butuhkan.",
                         style: theme.textTheme.bodySmall?.copyWith(

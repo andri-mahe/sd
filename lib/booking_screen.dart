@@ -23,44 +23,46 @@ class _BookingScreenState extends State<BookingScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Column(
         children: [
-          // HEADER
           Container(
-            padding: const EdgeInsets.only(
-              top: 60,
-              left: 20,
-              right: 20,
-              bottom: 24,
-            ),
             width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
             decoration: BoxDecoration(
-              color: colorScheme.primaryContainer,
+              color: isDark ? Colors.black : Colors.grey.shade200,
               borderRadius: const BorderRadius.only(
                 bottomRight: Radius.circular(40),
               ),
             ),
-            child: Column(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Logo
-                Center(child: Image.asset('assets/logo.png', height: 80)),
-                const SizedBox(height: 20),
-                Text(
-                  'Your Appointment',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Bookingan kamu sudah masuk\nTerimakasih, Stay Cool Brother',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onPrimaryContainer,
+                Image.asset('assets/logo.png', height: 80, fit: BoxFit.contain),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Your Appointment',
+                        style: TextStyle(
+                          color: const Color(0xFFFFB800),
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Bookingan kamu sudah masuk\nTerimakasih, Stay Cool Brother',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -69,59 +71,49 @@ class _BookingScreenState extends State<BookingScreen> {
 
           const SizedBox(height: 40),
 
-          // CARD BOOKING DETAIL
+          // Booking Info Card
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Container(
-              padding: const EdgeInsets.all(16),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
               decoration: BoxDecoration(
-                color: colorScheme.secondaryContainer,
+                color: const Color(0xFF2B6B7D),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      width: 60,
-                      height: 60,
-                      color: colorScheme.surface,
+                  // Icon / Image on left
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        bottomLeft: Radius.circular(20),
+                      ),
+                    ),
+                    child: Center(
                       child: Image.asset(
                         'assets/hair.png',
+                        width: 40,
+                        height: 40,
                         fit: BoxFit.contain,
                       ),
                     ),
                   ),
                   const SizedBox(width: 16),
-                  // Detail booking
+
+                  // Text details
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Day: ${widget.day}',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onSecondaryContainer,
-                          ),
-                        ),
-                        Text(
-                          'Hour: ${widget.hour}',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onSecondaryContainer,
-                          ),
-                        ),
-                        Text(
-                          'Service: ${widget.service}',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onSecondaryContainer,
-                          ),
-                        ),
-                        Text(
-                          'Barbershop: ${widget.barbershop}',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onSecondaryContainer,
-                          ),
-                        ),
+                        bookingText('Day: ${widget.day}'),
+                        bookingText('Hour: ${widget.hour}'),
+                        bookingText('Service: ${widget.service}'),
+                        bookingText('Barbershop: ${widget.barbershop}'),
                       ],
                     ),
                   ),
@@ -130,6 +122,20 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget bookingText(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

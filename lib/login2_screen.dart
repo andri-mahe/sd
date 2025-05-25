@@ -1,8 +1,9 @@
 import 'package:coba/menu_screen.dart';
+import 'package:coba/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'register_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,18 +24,43 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  void login() {
-    final username = usernameController.text.trim();
+  Future<void> login() async {
+    final email = usernameController.text.trim();
     final password = passwordController.text.trim();
 
-    if (username.isNotEmpty && password.isNotEmpty) {
-      box.write('username', username);
-      box.write('password', password);
-      Get.to(() => MenuScreen());
-    } else {
+    if (email.isEmpty || password.isEmpty) {
       Get.snackbar(
         'Error',
-        'Username dan Password harus diisi!',
+        'Email dan Password harus diisi!',
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    try {
+      final response = await Supabase.instance.client.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+
+      if (response.user != null) {
+        box.write('Email', email);
+        Get.off(() => MenuScreen());
+      }
+    } on AuthException catch (e) {
+      Get.snackbar(
+        'Login Gagal',
+        e.message,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Terjadi kesalahan saat login.',
         backgroundColor: Colors.redAccent,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
@@ -67,8 +93,9 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Username Field
+            // Email Field
             TextField(
+              style: TextStyle(color: Colors.black),
               controller: usernameController,
               decoration: InputDecoration(
                 filled: true,
@@ -76,9 +103,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 prefixIcon: Container(
                   padding: const EdgeInsets.all(10),
                   color: const Color(0xFF2E7886),
-                  child: const Icon(Icons.person, color: Colors.white),
+                  child: const Icon(Icons.email, color: Colors.white),
                 ),
-                hintText: 'USERNAME',
+                hintText: 'EMAIL',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -89,6 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
             // Password Field
             TextField(
+              style: TextStyle(color: Colors.black),
               controller: passwordController,
               obscureText: passwordTampil,
               decoration: InputDecoration(
@@ -153,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: const Text(
                     "Create Account",
                     style: TextStyle(
-                      color: Color.fromARGB(255, 255, 255, 255),
+                      color: Colors.white,
                       decoration: TextDecoration.underline,
                     ),
                   ),
