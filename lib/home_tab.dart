@@ -96,6 +96,7 @@ class _HomeTabState extends State<HomeTab> {
   Widget build(BuildContext context) {
     final username = box.read('username') ?? '';
     final password = box.read('password') ?? '';
+    final theme = Theme.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -103,7 +104,7 @@ class _HomeTabState extends State<HomeTab> {
         children: [
           Container(
             color:
-                Theme.of(context).appBarTheme.backgroundColor ?? Colors.black,
+                theme.appBarTheme.backgroundColor ?? theme.colorScheme.surface,
             padding: const EdgeInsets.all(20),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +117,7 @@ class _HomeTabState extends State<HomeTab> {
                     children: [
                       Text(
                         "Hello $username",
-                        style: const TextStyle(
+                        style: theme.textTheme.titleMedium?.copyWith(
                           color: Colors.amber,
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
@@ -124,27 +125,27 @@ class _HomeTabState extends State<HomeTab> {
                       ),
                       Text(
                         "PASS : $password",
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        style: theme.textTheme.bodyMedium,
                       ),
                       const SizedBox(height: 10),
-                      const Text(
+                      Text(
                         "Selamat datang di barbershop kami\nsilakan pilih layanan apa yang kamu butuhkan.",
-                        style: TextStyle(color: Colors.white70),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        ),
                       ),
                       const SizedBox(height: 10),
-                      const Text(
+                      Text(
                         "Let your hair do",
-                        style: TextStyle(
-                          fontSize: 22,
+                        style: theme.textTheme.headlineSmall?.copyWith(
                           color: Colors.amber,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Text(
+                      Text(
                         "the talking",
-                        style: TextStyle(
-                          fontSize: 22,
-                          color: Colors.white,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -156,11 +157,13 @@ class _HomeTabState extends State<HomeTab> {
           ),
           const SizedBox(height: 30),
           Row(
-            children: const [
-              Text("SELECT ", style: TextStyle(fontSize: 20)),
+            children: [
+              Text("SELECT ", style: theme.textTheme.titleMedium),
               Text(
                 "SERVICE",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -183,7 +186,10 @@ class _HomeTabState extends State<HomeTab> {
                 onTap: () => _onServiceTap(index),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isSelected ? Colors.white : Colors.blueGrey.shade700,
+                    color:
+                        isSelected
+                            ? theme.colorScheme.onSurface
+                            : theme.cardColor,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.all(8),
@@ -196,7 +202,10 @@ class _HomeTabState extends State<HomeTab> {
                         services[index]['label']!,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: isSelected ? Colors.black : Colors.amber,
+                          color:
+                              isSelected
+                                  ? theme.colorScheme.surface
+                                  : Colors.amber,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
@@ -209,11 +218,13 @@ class _HomeTabState extends State<HomeTab> {
           ),
           const SizedBox(height: 30),
           Row(
-            children: const [
-              Text("Best Top 2 ", style: TextStyle(fontSize: 20)),
+            children: [
+              Text("Best Top 2 ", style: theme.textTheme.titleMedium),
               Text(
                 "Barbershop",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),

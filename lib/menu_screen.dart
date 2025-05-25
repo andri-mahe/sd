@@ -1,9 +1,11 @@
-import 'package:coba/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'location_screen.dart';
 import 'home_tab.dart';
+import 'appointment_screen.dart';
+import 'settings_screen.dart';
+import 'booking_screen.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({Key? key}) : super(key: key);
@@ -43,8 +45,8 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   final List<Widget> _pages = [
     HomeTab(),
     LocationScreen(),
-    const Center(child: Text("Calendar")),
-    const Center(child: Text("Bookmark")),
+    AppointmentScreen(),
+    BookingScreen(day: '', hour: '', service: '', barbershop: ''),
     SettingsScreen(),
   ];
 

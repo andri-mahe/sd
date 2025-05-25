@@ -2,6 +2,7 @@ import 'package:coba/menu_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -144,9 +145,20 @@ class _LoginScreenState extends State<LoginScreen> {
             // Bottom Texts
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Text("Create Account", style: TextStyle(color: Colors.white)),
-                Text(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Get.to(() => const RegisterScreen());
+                  },
+                  child: const Text(
+                    "Create Account",
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+                const Text(
                   "Forgot your password?",
                   style: TextStyle(color: Colors.white),
                 ),

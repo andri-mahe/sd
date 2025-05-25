@@ -1,7 +1,9 @@
+import 'package:coba/customer_service_screen.dart';
 import 'package:coba/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'customer_service_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -96,6 +98,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildListTile(
               icon: Icons.support_agent,
               title: 'Customer Service',
+              onTap: () => Get.to(() => const CustomerServiceScreen()),
             ),
             _buildListTile(icon: Icons.logout, title: 'Log out', onTap: logout),
           ],
