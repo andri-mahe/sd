@@ -61,14 +61,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
         },
       );
 
-      if (response.user != null) {
+      final user = response.user;
+
+      if (user != null) {
+        // Simpan data ke tabel users
+        await Supabase.instance.client.from('users').insert({
+          'id': user.id,
+          'email': email,
+          'first_name': firstName,
+          'last_name': lastName,
+          'username': username,
+        });
+
         Get.snackbar('Sukses', 'Akun berhasil dibuat!');
         Get.to(() => const LoginScreen());
       }
-    } catch (e) {
+    } on AuthException catch (e) {
       Get.snackbar(
         'Gagal',
-        e.toString(),
+        e.message,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Terjadi kesalahan: $e',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );

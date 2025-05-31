@@ -147,57 +147,51 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
               const SizedBox(height: 10),
 
               // Month Label
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 6,
-                    horizontal: 20,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.chevron_left, color: Colors.amber),
+                    onPressed: () {
+                      setState(() {
+                        _focusedDay = DateTime(
+                          _focusedDay.year,
+                          _focusedDay.month - 1,
+                        );
+                        _selectedDay = null;
+                      });
+                    },
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.amber,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    DateFormat.MMMM().format(_focusedDay).toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 6,
+                      horizontal: 20,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.amber,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      "${DateFormat.MMMM().format(_focusedDay).toUpperCase()} ${_focusedDay.year}",
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              // Date Grid
-              GridView.count(
-                crossAxisCount: 7,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: _buildDateGrid(),
-              ),
-
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _focusedDay = DateTime(
-                        _focusedDay.year,
-                        _focusedDay.month + 1,
-                      );
-                      _selectedDay = null;
-                    });
-                  },
-                  child: Text(
-                    "See More >",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  IconButton(
+                    icon: const Icon(Icons.chevron_right, color: Colors.amber),
+                    onPressed: () {
+                      setState(() {
+                        _focusedDay = DateTime(
+                          _focusedDay.year,
+                          _focusedDay.month + 1,
+                        );
+                        _selectedDay = null;
+                      });
+                    },
                   ),
-                ),
+                ],
               ),
 
               const SizedBox(height: 20),

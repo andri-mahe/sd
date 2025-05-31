@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (response.user != null) {
-        box.write('Email', email);
+        box.write('email', email);
         Get.off(() => MenuScreen());
       }
     } on AuthException catch (e) {
@@ -95,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
             // Email Field
             TextField(
-              style: TextStyle(color: Colors.black),
+              style: const TextStyle(color: Colors.black),
               controller: usernameController,
               decoration: InputDecoration(
                 filled: true,
@@ -116,7 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
             // Password Field
             TextField(
-              style: TextStyle(color: Colors.black),
+              style: const TextStyle(color: Colors.black),
               controller: passwordController,
               obscureText: passwordTampil,
               decoration: InputDecoration(

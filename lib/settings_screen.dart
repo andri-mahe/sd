@@ -3,6 +3,7 @@ import 'package:coba/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -38,7 +39,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  void logout() async {
+  Future<void> logout() async {
     final confirm = await showDialog<bool>(
       context: context,
       builder:
@@ -59,9 +60,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
 
     if (confirm == true) {
-      box.remove('username');
-      box.remove('password');
-      Get.offAll(() => SplashScreen());
+      await Supabase.instance.client.auth.signOut(); // Supabase logout
+      Get.offAll(() => SplashScreen()); // Redirect ke splash
     }
   }
 

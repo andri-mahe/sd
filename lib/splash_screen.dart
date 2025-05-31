@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'package:coba/login2_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'login2_screen.dart';
 import 'menu_screen.dart';
 
@@ -12,18 +12,18 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  final box = GetStorage();
-
   @override
   void initState() {
     super.initState();
-    Timer(Duration(seconds: 3), () {
-      String? username = box.read('username');
-      String? password = box.read('password');
-      if (username != null && password != null) {
-        Get.off(() => MenuScreen());
+
+    // Delay 3 detik sambil cek session Supabase
+    Timer(const Duration(seconds: 3), () async {
+      final session = Supabase.instance.client.auth.currentSession;
+
+      if (session != null) {
+        Get.offAll(() => MenuScreen());
       } else {
-        Get.off(() => LoginScreen());
+        Get.offAll(() => LoginScreen());
       }
     });
   }
