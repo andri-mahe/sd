@@ -61,11 +61,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         },
       );
 
-      final user = response.user;
+      final user = Supabase.instance.client.auth.currentUser;
 
       if (user != null) {
-        // Simpan data ke tabel users
-        await Supabase.instance.client.from('users').insert({
+        await Supabase.instance.client.from('barbershop').insert({
           'id': user.id,
           'email': email,
           'first_name': firstName,
