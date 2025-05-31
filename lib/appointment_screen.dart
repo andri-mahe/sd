@@ -147,6 +147,37 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
               const SizedBox(height: 10),
 
               // Month Label
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 6,
+                    horizontal: 20,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.amber,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    DateFormat.MMMM().format(_focusedDay).toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // Date Grid
+              GridView.count(
+                crossAxisCount: 7,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                children: _buildDateGrid(),
+              ),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
