@@ -19,6 +19,9 @@ dependencies:
   intl: ^0.20.2
   supabase_flutter: ^2.9.0
   permission_handler: ^11.0.1
+  google_maps_flutter: ^2.12.2
+  geolocator: ^11.0.0
+  google_place: ^0.4.7
 
 
 
