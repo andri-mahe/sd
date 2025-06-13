@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-// ignore: unused_import
-import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-// ignore: unused_import
 import 'location_screen.dart';
+import 'appointment_controller.dart';
 
 class HomeTab extends StatefulWidget {
-  const HomeTab({Key? key}) : super(key: key);
+  final void Function(int)? onTabChange; // Tambah ini
+
+  const HomeTab({Key? key, this.onTabChange}) : super(key: key);
 
   @override
   State<HomeTab> createState() => _HomeTabState();
@@ -15,6 +16,7 @@ class HomeTab extends StatefulWidget {
 class _HomeTabState extends State<HomeTab> {
   final box = GetStorage();
   List<int> _selectedServices = [];
+  final appointmentController = Get.find<AppointmentController>();
 
   final List<Map<String, String>> services = [
     {'image': 'assets/hair.png', 'label': 'HAIR CUT'},
@@ -31,79 +33,98 @@ class _HomeTabState extends State<HomeTab> {
         _selectedServices.remove(index);
       } else {
         _selectedServices.add(index);
+        appointmentController.selectedService.value = services[index]['label']!;
       }
     });
   }
 
+  void _onBarbershopSelected(String name) {
+    appointmentController.selectedBarbershop.value = name;
+  }
+
   Widget buildBarbershopCard(String name, String address, String rating) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.amber,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                bottomLeft: Radius.circular(12),
-              ),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            child: Column(
-              children: [
-                const Icon(Icons.star, color: Colors.white, size: 24),
-                const SizedBox(height: 4),
-                Text(
-                  rating,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+    return GestureDetector(
+      onTap: () => _onBarbershopSelected(name),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.amber,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  bottomLeft: Radius.circular(12),
                 ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    name,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  const Icon(Icons.star, color: Colors.white, size: 24),
                   const SizedBox(height: 4),
                   Text(
-                    address,
-                    style: const TextStyle(color: Colors.amber, fontSize: 14),
+                    rating,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      address,
+                      style: const TextStyle(color: Colors.amber, fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
+  void _onBookNowPressed() {
+    final selected =
+        _selectedServices.map((i) => services[i]['label']).toList();
+    box.write('selectedServices', selected);
+
+    // Panggil pindah tab
+    widget.onTabChange?.call(1);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final username = box.read('username') ?? '';
-    final password = box.read('password') ?? '';
     final theme = Theme.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
+          // HEADER
           Container(
             color:
                 theme.appBarTheme.backgroundColor ?? theme.colorScheme.surface,
@@ -144,7 +165,10 @@ class _HomeTabState extends State<HomeTab> {
               ],
             ),
           ),
+
           const SizedBox(height: 30),
+
+          // SERVICE SELECTION
           Row(
             children: [
               Text("SELECT ", style: theme.textTheme.titleMedium),
@@ -159,6 +183,7 @@ class _HomeTabState extends State<HomeTab> {
           const SizedBox(height: 5),
           Container(height: 3, width: 100, color: Colors.amber),
           const SizedBox(height: 20),
+
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -205,7 +230,10 @@ class _HomeTabState extends State<HomeTab> {
               );
             },
           ),
+
           const SizedBox(height: 30),
+
+          // BARBERSHOPS
           Row(
             children: [
               Text("Best Top 2 ", style: theme.textTheme.titleMedium),
@@ -229,6 +257,27 @@ class _HomeTabState extends State<HomeTab> {
             "Macho Barbershop",
             "Jl. Solo - Tawangmangu km.11",
             "4.5",
+          ),
+
+          const SizedBox(height: 30),
+
+          // BOOK NOW BUTTON
+          ElevatedButton(
+            onPressed: _onBookNowPressed,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.amber,
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 40),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text(
+              'Book Now',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
           ),
         ],
       ),

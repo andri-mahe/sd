@@ -1,20 +1,11 @@
-import 'package:coba/location_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
+import 'appointment_controller.dart';
 
-class AppointmentScreen extends StatefulWidget {
-  const AppointmentScreen({Key? key}) : super(key: key);
-
-  @override
-  State<AppointmentScreen> createState() => _AppointmentScreenState();
-}
-
-class _AppointmentScreenState extends State<AppointmentScreen> {
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
-  String? _selectedHour;
-
+class AppointmentScreen extends StatelessWidget {
+  final Function(int tabIndex)? onTabChange;
   final List<String> hours = [
     '8:00 A.M.',
     '9:00 A.M.',
@@ -30,40 +21,46 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
     '08:00 P.M.',
   ];
 
-  List<Widget> _buildDateGrid() {
-    final daysInMonth = DateUtils.getDaysInMonth(
-      _focusedDay.year,
-      _focusedDay.month,
-    );
-    final firstDay = DateTime(_focusedDay.year, _focusedDay.month, 1);
-    final weekdayOffset = firstDay.weekday % 7;
+  AppointmentScreen({Key? key, this.onTabChange}) : super(key: key);
 
+  List<Widget> _buildDateGrid(
+    AppointmentController controller,
+    ThemeData theme,
+  ) {
+    final daysInMonth = DateUtils.getDaysInMonth(
+      controller.focusedDay.year,
+      controller.focusedDay.month,
+    );
+    final firstDay = DateTime(
+      controller.focusedDay.year,
+      controller.focusedDay.month,
+      1,
+    );
+    final weekdayOffset = firstDay.weekday % 7;
     final totalCells = daysInMonth + weekdayOffset;
     final List<Widget> dayWidgets = [];
 
     for (int i = 0; i < totalCells; i++) {
       if (i < weekdayOffset) {
-        dayWidgets.add(const SizedBox()); // kosong sebelum tanggal 1
+        dayWidgets.add(const SizedBox());
       } else {
         final day = i - weekdayOffset + 1;
-        final date = DateTime(_focusedDay.year, _focusedDay.month, day);
+        final date = DateTime(
+          controller.focusedDay.year,
+          controller.focusedDay.month,
+          day,
+        );
         final isSelected =
-            _selectedDay != null &&
-            _selectedDay!.year == date.year &&
-            _selectedDay!.month == date.month &&
-            _selectedDay!.day == date.day;
+            controller.selectedDay != null &&
+            controller.selectedDay!.difference(date).inDays == 0;
 
         dayWidgets.add(
           GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedDay = date;
-              });
-            },
+            onTap: () => controller.selectDay(date),
             child: Container(
               decoration: BoxDecoration(
                 color: isSelected ? Colors.amber : Colors.transparent,
-                border: Border.all(color: Theme.of(context).dividerColor),
+                border: Border.all(color: theme.dividerColor),
                 borderRadius: BorderRadius.circular(8),
               ),
               alignment: Alignment.center,
@@ -73,7 +70,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                   color:
                       isSelected
                           ? Colors.black
-                          : Theme.of(context).textTheme.bodyMedium?.color,
+                          : theme.textTheme.bodyMedium?.color,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
@@ -88,253 +85,263 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    Image.asset('assets/logo.png', width: 70),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Appointment",
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.amber,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "Silahkan pilih tanggal dan jam untuk membuat janji temu atau booking",
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+    final theme = Theme.of(context);
+    final box = GetStorage();
 
-              const SizedBox(height: 30),
-
-              // Select Date Title
-              Row(
+    return GetBuilder<AppointmentController>(
+      init: AppointmentController(),
+      builder: (controller) {
+        return Scaffold(
+          backgroundColor: theme.scaffoldBackgroundColor,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "SELECT DATE",
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(child: Container(height: 2, color: Colors.amber)),
-                ],
-              ),
-              const SizedBox(height: 10),
-
-              // Month Label
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 6,
-                    horizontal: 20,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.amber,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    DateFormat.MMMM().format(_focusedDay).toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              // Date Grid
-              GridView.count(
-                crossAxisCount: 7,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: _buildDateGrid(),
-              ),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.chevron_left, color: Colors.amber),
-                    onPressed: () {
-                      setState(() {
-                        _focusedDay = DateTime(
-                          _focusedDay.year,
-                          _focusedDay.month - 1,
-                        );
-                        _selectedDay = null;
-                      });
-                    },
-                  ),
+                  // Header
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 6,
-                      horizontal: 20,
-                    ),
                     decoration: BoxDecoration(
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.circular(12),
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Text(
-                      "${DateFormat.MMMM().format(_focusedDay).toUpperCase()} ${_focusedDay.year}",
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.chevron_right, color: Colors.amber),
-                    onPressed: () {
-                      setState(() {
-                        _focusedDay = DateTime(
-                          _focusedDay.year,
-                          _focusedDay.month + 1,
-                        );
-                        _selectedDay = null;
-                      });
-                    },
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // Select Hour Title
-              Row(
-                children: [
-                  Text(
-                    "SELECT HOUR",
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(child: Container(height: 2, color: Colors.amber)),
-                ],
-              ),
-              const SizedBox(height: 10),
-
-              // Hour Grid
-              GridView.builder(
-                shrinkWrap: true,
-                itemCount: hours.length,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
-                  childAspectRatio: 2.5,
-                ),
-                itemBuilder: (context, index) {
-                  final hour = hours[index];
-                  final isSelected = _selectedHour == hour;
-
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedHour = hour;
-                      });
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: isSelected ? Colors.amber : Colors.transparent,
-                        border: Border.all(
-                          color: Theme.of(context).dividerColor,
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      children: [
+                        Image.asset('assets/logo.png', width: 70),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Appointment",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.amber,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Silahkan pilih tanggal dan jam untuk membuat janji temu atau booking",
+                                style: theme.textTheme.bodyMedium,
+                              ),
+                            ],
+                          ),
                         ),
-                        borderRadius: BorderRadius.circular(10),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+
+                  // SELECT DATE
+                  Row(
+                    children: [
+                      Text("SELECT DATE", style: theme.textTheme.titleMedium),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Container(height: 2, color: Colors.amber),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 6,
+                        horizontal: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.amber,
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        hour,
-                        style: TextStyle(
-                          color:
-                              isSelected
-                                  ? Colors.black
-                                  : Theme.of(
-                                    context,
-                                  ).textTheme.bodyMedium?.color,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-
-              const SizedBox(height: 30),
-
-              // Action Buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_selectedDay != null && _selectedHour != null) {
-                          Get.to(() => ());
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.amber,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Text(
-                        "BOOK NOW",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                        DateFormat.MMMM()
+                            .format(controller.focusedDay)
+                            .toUpperCase(),
+                        style: const TextStyle(
                           color: Colors.black,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => Get.to(LocationScreen()),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                  const SizedBox(height: 10),
+
+                  GridView.count(
+                    crossAxisCount: 7,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: _buildDateGrid(controller, theme),
+                  ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.chevron_left,
+                          color: Colors.amber,
+                        ),
+                        onPressed: () => controller.changeMonth(false),
                       ),
-                      child: const Text(
-                        "CANCEL",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 6,
+                          horizontal: 20,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.amber,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          "${DateFormat.MMMM().format(controller.focusedDay).toUpperCase()} ${controller.focusedDay.year}",
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.chevron_right,
+                          color: Colors.amber,
+                        ),
+                        onPressed: () => controller.changeMonth(true),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // SELECT HOUR
+                  Row(
+                    children: [
+                      Text("SELECT HOUR", style: theme.textTheme.titleMedium),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Container(height: 2, color: Colors.amber),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  GridView.builder(
+                    shrinkWrap: true,
+                    itemCount: hours.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          mainAxisSpacing: 10,
+                          crossAxisSpacing: 10,
+                          childAspectRatio: 2.5,
+                        ),
+                    itemBuilder: (context, index) {
+                      final hour = hours[index];
+                      final isSelected = controller.selectedHour == hour;
+
+                      return GestureDetector(
+                        onTap: () => controller.selectHour(hour),
+                        child: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color:
+                                isSelected ? Colors.amber : Colors.transparent,
+                            border: Border.all(color: theme.dividerColor),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            hour,
+                            style: TextStyle(
+                              color:
+                                  isSelected
+                                      ? Colors.black
+                                      : theme.textTheme.bodyMedium?.color,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 30),
+
+                  // BUTTONS
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (controller.selectedDay != null &&
+                                controller.selectedHour != null) {
+                              box.write(
+                                'selectedDate',
+                                controller.selectedDay!.toIso8601String(),
+                              );
+                              box.write(
+                                'selectedHour',
+                                controller.selectedHour,
+                              );
+                              box.write(
+                                'selectedService',
+                                controller.selectedService.value,
+                              );
+                              box.write(
+                                'selectedBarbershop',
+                                controller.selectedBarbershop.value,
+                              );
+
+                              onTabChange?.call(3);
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.amber,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: const Text(
+                            "BOOK NOW",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            controller.reset();
+                            box.remove('selectedDate');
+                            box.remove('selectedHour');
+                            box.remove('selectedService');
+                            box.remove('selectedBarbershop');
+                            onTabChange?.call(0);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: const Text(
+                            "CANCEL",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

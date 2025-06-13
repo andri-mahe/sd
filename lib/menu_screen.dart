@@ -42,12 +42,30 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  final List<Widget> _pages = [
-    HomeTab(),
-    LocationScreen(),
-    AppointmentScreen(),
-    BookingScreen(day: '', hour: '', service: '', barbershop: ''),
-    SettingsScreen(),
+  List<Widget> get _pages => [
+    HomeTab(
+      onTabChange: (index) {
+        setState(() {
+          _selectedIndex = index;
+        });
+      },
+    ),
+    LocationScreen(
+      onTabChange: (index) {
+        setState(() {
+          _selectedIndex = index;
+        });
+      },
+    ),
+    AppointmentScreen(
+      onTabChange: (index) {
+        setState(() {
+          _selectedIndex = index;
+        });
+      },
+    ),
+    BookingScreen(),
+    const SettingsScreen(),
   ];
 
   @override

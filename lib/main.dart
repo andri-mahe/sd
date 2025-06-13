@@ -1,12 +1,16 @@
+import 'package:coba/appointment_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'splash_screen.dart';
 import 'theme_controller.dart';
+import 'appointment_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init();
+  Get.put(MenuController());
 
   await Supabase.initialize(
     url: 'https://vgmixkvynowtsqheozwn.supabase.co',
@@ -17,6 +21,7 @@ void main() async {
   await GetStorage.init();
   Get.put(MenuController());
   Get.put(ThemeController());
+  Get.put(AppointmentController());
 
   runApp(MyApp());
 }

@@ -1,9 +1,13 @@
 import 'menu_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'appointment_controller.dart';
 
 class LocationScreen extends StatefulWidget {
-  const LocationScreen({Key? key}) : super(key: key);
+  final void Function(int)? onTabChange;
+
+  const LocationScreen({Key? key, this.onTabChange}) : super(key: key);
 
   @override
   State<LocationScreen> createState() => _LocationScreenState();
@@ -12,8 +16,9 @@ class LocationScreen extends StatefulWidget {
 class _LocationScreenState extends State<LocationScreen> {
   final box = GetStorage();
   final TextEditingController _searchController = TextEditingController();
+  final AppointmentController appointmentController = Get.find();
 
-  final List<Map<String, String>> barbershops = [
+  List<Map<String, String>> barbershops = [
     {
       'name': "Oesman's Barbershop",
       'address': "Jl. Dr. Wahidin No.3B, Penumping",
@@ -50,8 +55,6 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final username = box.read('username') ?? '';
-    final password = box.read('password') ?? '';
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -153,7 +156,23 @@ class _LocationScreenState extends State<LocationScreen> {
                       horizontal: 20,
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    String keyword = _searchController.text.toLowerCase();
+                    setState(() {
+                      barbershops =
+                          barbershops
+                              .where(
+                                (shop) =>
+                                    shop['name']!.toLowerCase().contains(
+                                      keyword,
+                                    ) ||
+                                    shop['address']!.toLowerCase().contains(
+                                      keyword,
+                                    ),
+                              )
+                              .toList();
+                    });
+                  },
                   child: const Text("Search"),
                 ),
               ],
@@ -169,7 +188,16 @@ class _LocationScreenState extends State<LocationScreen> {
                 onTap: () {
                   setState(() {
                     selectedIndex = index;
-                    box.write('selectedBarbershop', shop);
+
+                    appointmentController.selectedBarbershop.value =
+                        shop['name'] ?? '';
+                    box.write('selectedBarbershopName', shop['name']);
+                    box.write('selectedBarbershopAddress', shop['address']);
+                    box.write('selectedBarbershopRating', shop['rating']);
+                  });
+
+                  Future.delayed(const Duration(milliseconds: 300), () {
+                    widget.onTabChange?.call(2);
                   });
                 },
                 child: Container(
